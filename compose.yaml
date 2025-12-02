@@ -1,15 +1,4 @@
 services:
-  # localstack:
-  #   image: localstack/localstack
-  #   container_name: localstack
-  #   ports:
-  #     - "4566:4566" # Porta principal do LocalStack
-  #   environment:
-  #     - SERVICES=apigateway,lambda,s3,dynamodb,sqs,sns
-  #     - DEBUG=1
-  #   volumes:
-  #     - "/var/run/docker.sock:/var/run/docker.sock"
-
   mysql:
     image: mysql:latest
     container_name: mysql_local
@@ -23,7 +12,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  # MongoDB - banco de dados usado pelo Graylog
   mongo:
     image: mongo:6
     container_name: mongo_graylog
@@ -32,7 +20,6 @@ services:
     networks:
       - graylog
 
-  # Elasticsearch - sistema de busca usado pelo Graylog
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
     container_name: elasticsearch_graylog
@@ -47,7 +34,6 @@ services:
     networks:
       - graylog
 
-  # Graylog - gerenciador de logs
   graylog:
     image: graylog/graylog:5.2
     container_name: graylog
@@ -55,19 +41,17 @@ services:
       - mongo
       - elasticsearch
     environment:
-      # IMPORTANTE: Trocar este secret por uma string aleatória longa (mínimo 16 caracteres)
       - GRAYLOG_PASSWORD_SECRET=somepasswordpepper_must_be_at_least_16_chars
-      # SHA256 da senha "admin" - Você pode mudar gerando: echo -n "suasenha" | sha256sum
       - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
       - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
       - GRAYLOG_MONGODB_URI=mongodb://mongo:27017/graylog
       - GRAYLOG_ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     ports:
-      - "9000:9000" # Interface Web
-      - "12201:12201/udp" # GELF UDP
-      - "12201:12201/tcp" # GELF TCP
-      - "1514:1514" # Syslog TCP
-      - "1514:1514/udp" # Syslog UDP
+      - "9000:9000" 
+      - "12201:12201/udp" 
+      - "12201:12201/tcp" 
+      - "1514:1514" 
+      - "1514:1514/udp" 
     volumes:
       - graylog_data:/usr/share/graylog/data
     networks:
